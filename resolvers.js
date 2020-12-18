@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 
 const JWT_SECRET = require("./constants");
+const beersData = require("./beers");
 
 const resolvers = {
   Query: {
@@ -44,6 +45,20 @@ const resolvers = {
       return jsonwebtoken.sign({ id: user.id, login: user.login }, JWT_SECRET, {
         expiresIn: "1d",
       });
+    },
+
+    async beer(_, { id }, { user }) {
+      if (user) {
+        return beersData.filter((beer) => beer.id == id)[0];
+      }
+      throw new Error("Sorry, you're not an authenticated user!");
+    },
+
+    async beers(_, { brand }, { user }) {
+      if (user) {
+        return beersData.filter((beer) => beer.brand == brand);
+      }
+      throw new Error("Sorry, you're not an authenticated user!");
     },
   },
 };
